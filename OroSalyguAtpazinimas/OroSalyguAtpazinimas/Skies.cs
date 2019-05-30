@@ -17,36 +17,29 @@ namespace OroSalyguAtpazinimas
     [Serializable]
     public class Skies
     {
-        //public Mat Image { get; set; }
         public float Mean { get; set; }
         public float Variance { get; set; }
         public string FileName { get; set; }
-        //public double Moments { get; set; }
         public float Energy { get; set; }
         public float Entropy { get; set; }
         public float Smoothness { get; set; }
         public string Name { get; set; }
-        public double Matching { get; set; }
 
-        //public double[] Normalized { get; set; }
+        
         public Skies ()
         {
 
         }
 
-        public void getSkies( float mean, float variance, string fileName, float energy, float entropy, float smoothness, string name, double matching)
+        public void getSkies( float mean, float variance, string fileName, float energy, float entropy, float smoothness, string name)
         {
-
-           // Image = image;
             Mean = mean;
             Variance = variance;
             FileName = fileName;
-           // Moments = moments;
             Energy = energy;
             Entropy = entropy;
             Smoothness = smoothness;
             Name = name;
-            Matching = matching;
         }
         
     }

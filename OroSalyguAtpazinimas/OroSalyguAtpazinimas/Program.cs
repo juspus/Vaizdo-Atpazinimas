@@ -331,7 +331,7 @@ namespace OroSalyguAtpazinimas
                 //matching = machingas(dangusPhoto, tempSky, 1);
                 //moments = Moments(bw);
                 Skies sky = new Skies();
-                sky.getSkies(mean, variance, file, energy, entropy, smoothness, name, matching);
+                sky.getSkies(mean, variance, file, energy, entropy, smoothness, name);
                 dangus.Add(sky);
                 GC.Collect();
             }
@@ -392,27 +392,20 @@ namespace OroSalyguAtpazinimas
                         case 0:
                             value = Math.Abs(tempDangus[test].Energy - dangus[skyDictionary.Keys.ElementAt(i)].Energy);
                             break;
-                        case 1:
+                        case 4:
                             value = Math.Abs(tempDangus[test].Mean - dangus[skyDictionary.Keys.ElementAt(i)].Mean);
                             break;
-                        case 2:
+                        case 1:
                             value = Math.Abs(tempDangus[test].Entropy -
                                              dangus[skyDictionary.Keys.ElementAt(i)].Entropy);
                             break;
-                        case 3:
+                        case 2:
                             value = Math.Abs(tempDangus[test].Smoothness -
                                              dangus[skyDictionary.Keys.ElementAt(i)].Smoothness);
                             break;
-                        case 4:
+                        case 3:
                             value = Math.Abs(tempDangus[test].Variance -
                                              dangus[skyDictionary.Keys.ElementAt(i)].Variance);
-                            break;
-                        /*case 5:
-                            value = Math.Abs(tempDangus[test].Moments -
-                                             dangus[skyDictionary.Keys.ElementAt(i)].Moments);
-                            break;*/
-                        case 6:
-                            value = dangus[skyDictionary.Keys.ElementAt(i)].Matching;
                             break;
                     }
 
@@ -434,23 +427,17 @@ namespace OroSalyguAtpazinimas
                         case 0:
                             value = Math.Abs(tempDangus[test].Energy - dangus[i].Energy);
                             break;
-                        case 1:
+                        case 4:
                             value = Math.Abs(tempDangus[test].Mean - dangus[i].Mean);
                             break;
-                        case 2:
+                        case 1:
                             value = Math.Abs(tempDangus[test].Entropy - dangus[i].Entropy);
                             break;
-                        case 3:
+                        case 2:
                             value = Math.Abs(tempDangus[test].Smoothness - dangus[i].Smoothness);
                             break;
-                        case 4:
+                        case 3:
                             value = Math.Abs(tempDangus[test].Variance - dangus[i].Variance);
-                            break;
-                        /*case 5:
-                            value = Math.Abs(tempDangus[test].Moments - dangus[i].Moments);
-                            break;*/
-                         case 6:
-                            value = dangus[skyDictionary.Keys.ElementAt(i)].Matching;
                             break;
                     }
 
@@ -467,22 +454,16 @@ namespace OroSalyguAtpazinimas
                         Console.WriteLine("Energy: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
                         break;
                     case 1:
-                        Console.WriteLine("Mean: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
-                        break;
-                    case 2:
                         Console.WriteLine("Entropy: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
                         break;
-                    case 3:
+                    case 2:
                         Console.WriteLine("Smoothness: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
                         break;
-                    case 4:
+                    case 3:
                         Console.WriteLine("Variance: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
                         break;
-                    /*case 5:
-                        Console.WriteLine("Moment: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
-                        break;*/
-                    case 6:
-                        Console.WriteLine("Fourier: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
+                    case 4:
+                        Console.WriteLine("Mean: {0}      {1}", skyDictionary2.Values.ElementAt(i), dangus[skyDictionary2.Keys.ElementAt(i)].FileName);
                         break;
                 }
             }
@@ -512,106 +493,11 @@ namespace OroSalyguAtpazinimas
                 array[4]++;
             }
         }
-        static void Main(string[] args)
+
+        static string oroSalygosFunc(int i)
         {
-            int test = 0;
-            
-            List<Skies> dangus = new List<Skies>(); 
-            List<TempSky> tempDangus = new List<TempSky>();
-            classMakeTemp(out tempDangus, @"C:\Users\Laptop\Desktop\temp");
-            Console.WriteLine("Press a or anything else.");
-            if(tempDangus.Count>0 && (Console.ReadKey().KeyChar == 'a'))
-                classMake(out dangus, @"C:\Users\Laptop\Desktop\asd2", tempDangus[0].Image);
-            else if (tempDangus.Count > 0)
-            {
-                dangus = DeSerializeObject<List<Skies>>(@".\dangau.xml");
-            }
-            else
-                System.Environment.Exit(1);
             string oroSalygos = "";
-            int[] debesuotumasArray = new int[5];
-            //foreach (var sky in dangus)
-            //{
-                SerializeObject<List<Skies>>(dangus, @".\dangau.xml");
-            //}
-
-            GC.Collect();
-            Dictionary<int, double> skyDictionary = new Dictionary<int, double>();
-            
-            /*skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 5);
-            counteris(dangus, skyDictionary, debesuotumasArray);*/
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 0);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 2);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 3);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 4);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 1);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 6);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 5);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 0);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 2);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 3);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 4);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 1);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 6);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 5);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 0);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 2);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 3);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 4);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 1);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 6);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 5);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 0);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 2);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 3);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 4);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 1);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 6);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 5);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 0);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 2);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 3);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 4);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 1);
-            counteris(dangus, skyDictionary, debesuotumasArray);
-            //skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, 6);
-            //counteris(dangus, skyDictionary, debesuotumasArray);
-
-            Window show = new Window("Dangus", WindowMode.FreeRatio);
-
-            switch (debesuotumasArray.ToList().IndexOf(debesuotumasArray.Max()))
+            switch (i)
             {
                 case 0:
                     oroSalygos = "Debesuota";
@@ -630,14 +516,83 @@ namespace OroSalyguAtpazinimas
                     break;
             }
 
+            return oroSalygos;
+        }
+        static void Main(string[] args)
+        {
+            int test = 0;
+            
+            List<Skies> dangus = new List<Skies>(); 
+            List<TempSky> tempDangus = new List<TempSky>();
+            classMakeTemp(out tempDangus, @"C:\Users\Laptop\Desktop\temp");
+            Console.WriteLine("Press a or anything else.");
+            if(tempDangus.Count>0 && (Console.ReadKey().KeyChar == 'a'))
+                classMake(out dangus, @"C:\Users\Laptop\Desktop\asd2", tempDangus[0].Image);
+            else if (tempDangus.Count > 0)
+            {
+                dangus = DeSerializeObject<List<Skies>>(@".\dangau.xml");
+            }
+            else
+                System.Environment.Exit(1);
+            string oroSalygos = "";
+            int[] debesuotumasArray = new int[5];
+            
+
+            GC.Collect();
+            Dictionary<int, double> skyDictionary = new Dictionary<int, double>();
+
+            for (int i = 0; i < dangus.Count; i = i+5)
+            {
+                if (dangus.Count - i > 5)
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        skyDictionary = Surykiavimas(skyDictionary, tempDangus, dangus, test, j);
+                        counteris(dangus, skyDictionary, debesuotumasArray);
+                    }
+                }
+                
+            }
+
+            Window show = new Window("Dangus", WindowMode.FreeRatio);
+
+            oroSalygos = oroSalygosFunc(debesuotumasArray.ToList().IndexOf(debesuotumasArray.Max()));
+            
             if (tempDangus.Count>0)
             {
+                Skies sky = new Skies();
+                
+
                 Point vieta = new Point(100,100);
                 Cv2.PutText(tempDangus[test].Image, oroSalygos, vieta, FontFace.Italic, 3, Scalar.Red, 5);
                 show.Image = tempDangus[test].Image;
+                WaitKey();
+                if (Console.ReadKey().KeyChar == 'a')
+                {
+                    sky.getSkies(tempDangus[test].Mean, tempDangus[test].Variance, tempDangus[test].FileName,
+                        tempDangus[test].Energy, tempDangus[test].Entropy, tempDangus[test].Smoothness, oroSalygos);
+                    dangus.Add(sky);
+                }
+                else
+                {
+                    Console.WriteLine("0: Debesuota,  1:Labai Debesuota, 2:Sauleta su debesimis, 3:Lengvai Debesuota, 4:Giedra");
+                    string irasyta= Console.ReadLine();
+                    int inSk = Int32.Parse(irasyta);
+                    oroSalygos = oroSalygosFunc(inSk);
+                    if (oroSalygos == "")
+                    {
+                        System.Environment.Exit(0);
+                    }
+                    sky.getSkies(tempDangus[test].Mean, tempDangus[test].Variance, tempDangus[test].FileName,
+                        tempDangus[test].Energy, tempDangus[test].Entropy, tempDangus[test].Smoothness, oroSalygos);
+                    dangus.Add(sky);
+                }
+                SerializeObject<List<Skies>>(dangus, @".\dangau.xml");
             }
-
-            WaitKey();
+            else
+            {
+                System.Environment.Exit(1);
+            }
         }
     }
 }
