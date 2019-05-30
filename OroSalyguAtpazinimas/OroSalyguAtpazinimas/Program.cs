@@ -9,6 +9,8 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
+using System.Xml;
+using System.Xml.Serialization;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
 using static OpenCvSharp.CPlusPlus.Cv2;
@@ -18,6 +20,61 @@ namespace OroSalyguAtpazinimas
 {
     class Program
     {
+        public static void SerializeObject<T>(T serializableObject, string fileName)
+        {
+            if (serializableObject == null) { return; }
+
+            try
+            {
+                XmlDocument xmlDocument = new XmlDocument();
+                XmlSerializer serializer = new XmlSerializer(serializableObject.GetType());
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    serializer.Serialize(stream, serializableObject);
+                    stream.Position = 0;
+                    xmlDocument.Load(stream);
+                    xmlDocument.Save(fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log exception here
+                Console.WriteLine(ex);
+            }
+        }
+
+        public static T DeSerializeObject<T>(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName)) { return default(T); }
+
+            T objectOut = default(T);
+
+            try
+            {
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.Load(fileName);
+                string xmlString = xmlDocument.OuterXml;
+
+                using (StringReader read = new StringReader(xmlString))
+                {
+                    Type outType = typeof(T);
+
+                    XmlSerializer serializer = new XmlSerializer(outType);
+                    using (XmlReader reader = new XmlTextReader(read))
+                    {
+                        objectOut = (T)serializer.Deserialize(reader);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log exception here
+                Console.WriteLine(ex);
+            }
+
+            return objectOut;
+        }
+
         private static double machingas(Mat sky, Mat tempSky, int atvejis)
         {
             Mat result = sky;
@@ -273,7 +330,9 @@ namespace OroSalyguAtpazinimas
                 
                 //matching = machingas(dangusPhoto, tempSky, 1);
                 //moments = Moments(bw);
-                dangus.Add(new Skies((float) mean, (float) variance, file, energy, entropy, smoothness, name, matching));
+                Skies sky = new Skies();
+                sky.getSkies(mean, variance, file, energy, entropy, smoothness, name, matching);
+                dangus.Add(sky);
                 GC.Collect();
             }
         }
@@ -460,12 +519,21 @@ namespace OroSalyguAtpazinimas
             List<Skies> dangus = new List<Skies>(); 
             List<TempSky> tempDangus = new List<TempSky>();
             classMakeTemp(out tempDangus, @"C:\Users\Laptop\Desktop\temp");
-            if(tempDangus.Count>0)
+            Console.WriteLine("Press a or anything else.");
+            if(tempDangus.Count>0 && (Console.ReadKey().KeyChar == 'a'))
                 classMake(out dangus, @"C:\Users\Laptop\Desktop\asd2", tempDangus[0].Image);
+            else if (tempDangus.Count > 0)
+            {
+                dangus = DeSerializeObject<List<Skies>>(@".\dangau.xml");
+            }
             else
                 System.Environment.Exit(1);
             string oroSalygos = "";
             int[] debesuotumasArray = new int[5];
+            //foreach (var sky in dangus)
+            //{
+                SerializeObject<List<Skies>>(dangus, @".\dangau.xml");
+            //}
 
             GC.Collect();
             Dictionary<int, double> skyDictionary = new Dictionary<int, double>();
