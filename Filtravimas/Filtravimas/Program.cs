@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
 
@@ -104,56 +105,128 @@ namespace Filtravimas
             return xs[xs.Length / 2];
         }
 
+        static void CameraWork(VideoCapture cap, Mat kernel, Mat thresholded)
+        {
+            while (true)
+            {
+                Mat img = new Mat();
+                cap.Read(img);
+                if (img.Cols > 0)
+                {
+                    
+                    Mat filtered = new Mat();
+                    Cv2.Filter2D(img, filtered, img.Depth(), kernel);
+                    Cv2.Threshold(filtered, thresholded, 120, 255, ThresholdType.Binary);
+                }
+            }
+        }
+
+
+
         static void Main(string[] args)
         {
             Mat orig_img = Cv2.ImRead(@"C:\Users\Laptop\Documents\Projektai\Vaizdo-Atpazinimas\Filtravimas\spatialnoise_ship.png", LoadMode.GrayScale);
             Mat img2 = Cv2.ImRead(@"C:\Users\Laptop\Documents\Projektai\Vaizdo-Atpazinimas\Filtravimas\download.jpg",
                 LoadMode.GrayScale);
+            Mat img3 = Cv2.ImRead(@"C:\Users\Laptop\Documents\Projektai\Vaizdo-Atpazinimas\Filtravimas\poses-selfie-inst.jpg", LoadMode.Color);
+            Mat gray_img3 = new Mat();
+            Mat filtered = new Mat();
+            Mat thresholded = new Mat();
+            VideoCapture cap = new VideoCapture(0);
+            Mat video = new Mat();
+            Window show = new Window("originalas", WindowMode.FreeRatio);
+            Window kernel_wind = new Window("Kernel", WindowMode.FreeRatio);
+            Window median_wind = new Window("Median", WindowMode.FreeRatio);
+            Window sharp_wind = new Window("Sharp", WindowMode.FreeRatio);
+            Window sharp_wind2 = new Window("Sharping2", WindowMode.FreeRatio);
+            Window threshold = new Window("Threshold", WindowMode.FreeRatio);
+
+            //Cv2.CvtColor(img3, gray_img3, ColorConversion.RgbToGray);
 
             Mat kernel = Mat.Ones(new Size(3, 3), MatType.CV_8U);
+
+
             // Mat kernel_second = Mat.Ones(new Size(3, 3), MatType.CV_8U);
             int[,] kernelArray2 = { { 0, -1, 0 }, { -1, 4, -1 }, {0, -1 ,0} };
             Mat kernel_second = Mat.Ones(new Size(3, 3), MatType.CV_32F);
 
-            kernel_second.Set<float>(0, 0, 0);
-            kernel_second.Set<float>(0, 1, -1);
-            kernel_second.Set<float>(0, 2, 0);
+            kernel_second.Set<Vec2f>(0, 0, new Vec2f(0, 0));
+            kernel_second.Set<Vec2f>(0, 1, new Vec2f(-2, -2));
+            kernel_second.Set<Vec2f>(0, 2, new Vec2f(0, 0));
 
-            kernel_second.Set<float>(1, 0, -1);
-            kernel_second.Set<float>(1, 1, 4);
-            kernel_second.Set<float>(1, 2, -1);
+            kernel_second.Set<Vec2f>(1, 0, new Vec2f(-2, -2));
+            kernel_second.Set<Vec2f>(1, 1, new Vec2f(8, 8));
+            kernel_second.Set<Vec2f>(1, 2, new Vec2f(-2, -2));
 
-            kernel_second.Set<float>(2, 0, 0);
-            kernel_second.Set<float>(2, 1, -1);
-            kernel_second.Set<float>(2, 2, 0);
+            kernel_second.Set<Vec2f>(2, 0, new Vec2f(0, 0));
+            kernel_second.Set<Vec2f>(2, 1, new Vec2f(-2, -2));
+            kernel_second.Set<Vec2f>(2, 2, new Vec2f(0, 0));
 
             
-            //Mat filtered_img = doKernel(orig_img, kernel);
+            Mat filtered_img = doKernel(orig_img, kernel);
             Mat median_img = doMedianFilter(orig_img, kernel);
             Mat filteredImg2 = doKernel(median_img, kernel_second);
+            Cv2.Filter2D(img3, filtered, img3.Depth(), kernel_second);
+            Cv2.Threshold(filtered, thresholded, 120, 255, ThresholdType.Binary);
+           
+            Mat shape1 = Cv2.GetStructuringElement(StructuringElementShape.Cross, new Size(5, 5));
+            Mat shape2 = Cv2.GetStructuringElement(StructuringElementShape.Rect, new Size(5, 5));
+            Mat shape3 = Cv2.GetStructuringElement(StructuringElementShape.Ellipse, new Size(5, 5));
+            while (true)
+            {
+                cap.Read(video);
+                if (video.Cols > 0)
+                {
+                    Mat[] channels = Cv2.Split(video);
+
+
+                    Cv2.Canny(channels[0], channels[0], 60, 60);
+                    Cv2.Canny(channels[1], channels[1], 60, 60);
+                    Cv2.Canny(channels[2], channels[2], 60, 60);
+
+                    Cv2.Dilate(channels[0], channels[0], shape1, null, 1);
+                    Cv2.Dilate(channels[1], channels[1], shape2, null, 1);
+                    Cv2.Dilate(channels[2], channels[1], shape3, null, 1);
+
+                    //Cv2.Canny(orig_img, filtered, 60, 60);
+                    //Cv2.Dilate(filtered, filtered, shape, null, 2);
+
+                    Cv2.Merge(channels, video);
+                    show.Image = video;
+                    GC.Collect();
+                }
+
+                if (Cv2.WaitKey(10) == 'q')
+                {
+                    break;
+                }
+            }
+            cap.Release();
+
             var testVector = filteredImg2.ToCvMat();
 
           //  Console.WriteLine(testVector);
 
-            Window show = new Window("originalas", WindowMode.FreeRatio);
-           // Window kernel_wind = new Window("Kernel", WindowMode.FreeRatio);
-            Window median_wind = new Window("Median", WindowMode.FreeRatio);
-            Window sharp_wind = new Window("Sharp", WindowMode.FreeRatio);
+            
+            
 
             show.Image = orig_img;
-          //  kernel_wind.Image = filtered_img;
             median_wind.Image = median_img;
             sharp_wind.Image = filteredImg2;
+            sharp_wind2.Image = filtered;
+            threshold.Image = thresholded;
 
             Cv2.WaitKey(0);
             show.Close();
-          //  kernel_wind.Close();
+            kernel_wind.Close();
+            threshold.Close();
+            sharp_wind2.Close();
             median_wind.Close();
             sharp_wind.Close();
             filteredImg2.Release();
+            filtered.Release();
             median_img.Release();
             orig_img.Release();
-           // filtered_img.Release();
         }
     }
 }
